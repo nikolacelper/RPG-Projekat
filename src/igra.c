@@ -9,7 +9,6 @@
 #define MAX_COLS 100
 #define MAX_INVENTAR 7
 #define UKUPNO_NIVOA 5
-
 #define BORBA_POBJEDA 1
 #define BORBA_BEKSTVO_IGRACA 2
 #define BORBA_BEKSTVO_NEPRIJATELJA 3
@@ -167,6 +166,91 @@ int pokreniBorbu(Neprijatelj *vanjski) {
 }
 
 int ucitajNivo(int broj_nivoa) {
+    char ime_fajla[30];
+
+    sprintf(ime_fajla, "nivo%d.txt", broj_nivoa);
+
+    FILE *f = fopen(ime_fajla, "r");
+
+    if (f == NULL) {
+        printf("Greska pri otvaranju fajla: %s\n", ime_fajla);
+        printf("Fajl mora biti u istom folderu gdje se pokrece .exe.\n");
+        return 0;
+    }
+
+    rows = 0;
+
+    while (rows < MAX_ROWS && fgets(map[rows], MAX_COLS, f)) {
+        for (int i = 0; i < MAX_COLS; i++) {
+            if (map[rows][i] == '\n' || map[rows][i] == '\r') {
+                map[rows][i] = '\0';
+            }
+        }
+
+        rows++;
+    }
+
+    fclose(f);
+
+    int pronadjen_igrac = 0;
+
+    for (int y = 0; y < rows; y++) {
+        for (int x = 0; map[y][x] != '\0'; x++) {
+            if (map[y][x] == '@') {
+                px = x;
+                py = y;
+                pronadjen_igrac = 1;
+            }
+        }
+    }
+
+    if (!pronadjen_igrac) {
+        printf("Greska: u fajlu %s ne postoji znak @ za igraca.\n", ime_fajla);
+        return 0;
+    }
+
+    for (int y = 0; y < MAX_ROWS; y++)
+        for (int x = 0; x < MAX_COLS; x++)
+            neprijatelj_aktivan[y][x] = 0;
+
+    garantovani_kljuc_y = -1;
+    garantovani_kljuc_x = -1;
+
+    int ima_zakljucana_vrata = 0;
+    for (int y = 0; y < rows; y++) {
+        for (int x = 0; map[y][x] != '\0'; x++) {
+            if (map[y][x] == 'L') {
+                ima_zakljucana_vrata = 1;
+            }
+        }
+    }
+
+    if (ima_zakljucana_vrata) {
+        int kutija_y[MAX_ROWS * MAX_COLS];
+        int kutija_x[MAX_ROWS * MAX_COLS];
+        int broj_kutija = 0;
+
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; map[y][x] != '\0'; x++) {
+                if (map[y][x] == '$') {
+                    kutija_y[broj_kutija] = y;
+                    kutija_x[broj_kutija] = x;
+                    broj_kutija++;
+                }
+            }
+        }
+
+        if (broj_kutija > 0) {
+            int izbor = rand() % broj_kutija;
+            garantovani_kljuc_y = kutija_y[izbor];
+            garantovani_kljuc_x = kutija_x[izbor];
+        }
+    }
+
+    trenutni_nivo = broj_nivoa;
+
+    return 1;
+
 
 }
 
