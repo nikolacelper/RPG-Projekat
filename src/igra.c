@@ -199,7 +199,38 @@ void novaIgra(int ucitaj_save) {
 }
 
 void uputstvo() {
+void uputstvo() {
+    system("cls");
 
+    printf("=== UPUTSTVO ===\n\n");
+
+    printf("Cilj igre je da prodjes kroz 5 nivoa lavirinta.\n\n");
+
+    printf("Kontrole:\n");
+    printf("W - gore\n");
+    printf("A - lijevo\n");
+    printf("S - dole\n");
+    printf("D - desno\n");
+    printf("I - inventar\n");
+    printf("Q - izlaz iz igre\n\n");
+
+    printf("Simboli:\n");
+    printf("@ - igrac\n");
+    printf("# - zid\n");
+    printf(". - prazan prostor\n");
+    printf("E - neprijatelj\n");
+    printf("$ - predmet\n");
+    printf("? - misteriozni napitak\n");
+    printf("> - izlaz\n");
+    printf("L - zakljucan izlaz, potreban je kljuc\n\n");
+
+    printf("Borba:\n");
+    printf("N - napad\n");
+    printf("O - odbrana\n");
+    printf("B - bekstvo, ima 50%% sanse za uspeh\n\n");
+
+    pauza();
+}
 }
 
 void sacuvajIgru() {
