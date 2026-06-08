@@ -89,14 +89,48 @@ Igrac heroj = {
 };
 
 void pauza() {
+    printf("\nPritisni bilo koji taster...");
+    _getch();
 
 }
 
 void izracunajStatistiku() {
+    heroj.napad = heroj.osnovni_napad + heroj.bonus_maca;
+    heroj.odbrana = heroj.osnovna_odbrana + heroj.bonus_stita;
+
+    if (heroj.napad < 1) {
+        heroj.napad = 1;
+    }
+
+    if (heroj.odbrana < 0) {
+        heroj.odbrana = 0;
+    }
 
 }
 
 void iscrtajHPBar(int hp, int max_hp) {
+    int popunjeno = (hp * 10) / max_hp;
+
+    if (popunjeno < 0) {
+        popunjeno = 0;
+    }
+
+    if (popunjeno > 10) {
+        popunjeno = 10;
+    }
+
+    printf("HP: [");
+
+    for (int i = 0; i < 10; i++) {
+        if (i < popunjeno) {
+            printf("#");
+        }
+        else {
+            printf(".");
+        }
+    }
+
+    printf("] %d/%d\n", hp, max_hp);
 
 }
 
