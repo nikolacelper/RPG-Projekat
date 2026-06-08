@@ -384,21 +384,81 @@ void prikaziKratakInventar() {
 
 }
 
+/* Uklanja predmet na zadatom indeksu i pomjera ostale predmete lijevo */
 void ukloniPredmet(int indeks) {
+     if (indeks < 0 || indeks >= heroj.broj_predmeta) {
+        return;
+    }
 
+    /*
+       Ako izbacujemo Vatreni mac iz inventara,
+       a on je trenutno aktivan, ukidamo njegovu kaznu.
+    */
+    if (heroj.inventar[indeks].tip == MAC_VATRENI &&
+        heroj.kazna_maca_po_potezu == 10 &&
+        heroj.bonus_maca == heroj.inventar[indeks].bonus) {
+
+        heroj.bonus_maca = 0;
+        heroj.kazna_maca_po_potezu = 0;
+        izracunajStatistiku();
+    }
+
+    /*
+       Ako izbacujemo Vitezov mac iz inventara,
+       a on je trenutno aktivan, ukidamo njegovu kaznu.
+    */
+    if (heroj.inventar[indeks].tip == MAC_VITEZOV &&
+        heroj.kazna_maca_po_potezu == 5 &&
+        heroj.bonus_maca == heroj.inventar[indeks].bonus) {
+
+        heroj.bonus_maca = 0;
+        heroj.kazna_maca_po_potezu = 0;
+        izracunajStatistiku();
+    }
+
+    /*
+       Ako izbacujemo Obican mac koji je opremljen,
+       skidamo njegov bonus napada.
+    */
+    if (heroj.inventar[indeks].tip == MAC_OBICAN &&
+        heroj.bonus_maca == heroj.inventar[indeks].bonus) {
+
+        heroj.bonus_maca = 0;
+        heroj.kazna_maca_po_potezu = 0;
+        izracunajStatistiku();
+    }
+
+    for (int i = indeks; i < heroj.broj_predmeta - 1; i++) {
+        heroj.inventar[i] = heroj.inventar[i + 1];
+    }
+
+    heroj.broj_predmeta--;
 }
-
 int pronadjiEliksir() {
+    for (int i = 0; i < heroj.broj_predmeta; i++) {
+        if (heroj.inventar[i].tip == ELIKSIR_ZIVOTA) {
+            return i;
+        }
+    }
+
+    return -1;
 
 }
+
 
 int imaKljuc() {
+      for (int i = 0; i < heroj.broj_predmeta; i++) {
+        // Provera da li je trenutni predmet ključ
+        if (heroj.inventar[i].tip == KLJUC) {
+            return i;
+        }
+    }
+    // Ako ključ nije pronađen, vraća -1
+    return -1;
 
 }
 
-int upotrebiEliksirAkoPostoji() {
 
-}
 
 void napraviPredmet(Predmet *p, TipPredmeta tip) {
   p->tip = tip;
