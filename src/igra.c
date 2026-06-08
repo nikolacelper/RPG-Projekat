@@ -61,8 +61,206 @@ typedef struct {
     int napad;
     int odbrana;
 } Neprijatelj;
+void ispisiStanjeBorbe(Neprijatelj n) {
+    printf("=== BORBA ===\n");
+    printf("Neprijatelj: %s\n", n.naziv);
+    printf("----------------------------------\n");
 
-int pokreniBorbu(Neprijatelj *vanjski);
+    printf("IGRAC:\n");
+    printf("HP: %d/%d | Napad: %d | Odbrana: %d\n",
+           heroj.hp, heroj.max_hp, heroj.napad, heroj.odbrana);
+
+    printf("\nNEPRIJATELJ:\n");
+    printf("HP: %d | Napad: %d | Odbrana: %d\n",
+           n.hp, n.napad, n.odbrana);
+
+    printf("----------------------------------\n");
+}
+/* Pokrece borbu izmedju igraca i neprijatelja.
+   Ako je vanjski NULL, generise se novi neprijatelj sa punim HP-om.
+   Ako je vanjski != NULL, koristi se postojeci neprijatelj sa sacuvanim HP-om.
+   Vraca ishod: BORBA_POBJEDA, BORBA_BEKSTVO_IGRACA ili BORBA_BEKSTVO_NEPRIJATELJA. */
+int pokreniBorbu(Neprijatelj *vanjski) {
+    Neprijatelj lokalni;
+
+    /* Ako pokazivac nije proslijedjen, generisi novog neprijatelja za ovu borbu */
+    if (vanjski == NULL) {
+        lokalni = generisiNeprijatelja();
+        vanjski = &lokalni;
+    }
+
+    system("cls");
+
+    printf("!!! POCELA JE BORBA !!!\n\n");
+    printf("Parametri na pocetku borbe:\n\n");
+
+    ispisiStanjeBorbe(*vanjski);
+
+    pauza();
+
+    /* Borba traje dok jedan od ucesnika ne ostane bez HP-a */
+    while (heroj.hp > 0 && vanjski->hp > 0) {
+        system("cls");
+
+        ispisiStanjeBorbe(*vanjski);
+
+        printf("Izaberi akciju:\n");
+        printf("N - Napad\n");
+        printf("O - Odbrana\n");
+        printf("B - Bekstvo\n");
+        printf("Izbor: ");
+
+        char izbor = _getch();
+
+        int akcija_igraca = 0;
+
+        /* Mapiranje unesenog tastera na broj akcije: 1=napad, 2=odbrana, 3=bekstvo */
+        if (izbor == 'n' || izbor == 'N') {
+            akcija_igraca = 1;
+        }
+        else if (izbor == 'o' || izbor == 'O') {
+            akcija_igraca = 2;
+        }
+        else if (izbor == 'b' || izbor == 'B') {
+            akcija_igraca = 3;
+        }
+        else {
+            printf("\nPogresan taster. Koristi N, O ili B.");
+            pauza();
+            continue;
+        }
+
+        /* Neprijatelj bira akciju nasumicno: 1=napad, 2=odbrana, 3=bekstvo */
+        int akcija_neprijatelja = (rand() % 3) + 1;
+
+        int igrac_pobjegao = 0;
+        int neprijatelj_pobjegao = 0;
+
+        /* Ispisi akcije oba ucesnika prije razrjesavanja poteza */
+        printf("\n\nTvoja akcija: ");
+
+        if (akcija_igraca == 1) {
+            printf("NAPAD");
+        }
+        else if (akcija_igraca == 2) {
+            printf("ODBRANA");
+        }
+        else {
+            printf("BEKSTVO");
+        }
+
+        printf("\nAkcija neprijatelja: ");
+
+        if (akcija_neprijatelja == 1) {
+            printf("NAPAD");
+        }
+        else if (akcija_neprijatelja == 2) {
+            printf("ODBRANA");
+        }
+        else {
+            printf("BEKSTVO");
+        }
+
+        /* Bjekstvo ima 50% sanse za uspjeh za oba ucesnika */
+        if (akcija_igraca == 3) {
+            if ((rand() % 100) < 50) {
+                printf("\n\nUspio si da pobjegnes iz borbe!");
+                igrac_pobjegao = 1;
+            }
+            else {
+                printf("\n\nPokusao si da pobjegnes, ali nisi uspio.");
+            }
+        }
+
+        if (akcija_neprijatelja == 3) {
+            if ((rand() % 100) < 50) {
+                printf("\nNeprijatelj je pobjegao iz borbe!");
+                neprijatelj_pobjegao = 1;
+            }
+            else {
+                printf("\nNeprijatelj je pokusao da pobjegne, ali nije uspio.");
+            }
+        }
+
+        /* Provjeri bjekstvo prije nanosenja stete - ko pobjegne ne prima stetu */
+        if (igrac_pobjegao) {
+            pauza();
+            return BORBA_BEKSTVO_IGRACA;
+        }
+
+        if (neprijatelj_pobjegao) {
+            pauza();
+            return BORBA_BEKSTVO_NEPRIJATELJA;
+        }
+
+        /* Igrac napada - ako neprijatelj brani, steta se umanjuje za njegovu odbranu */
+        if (akcija_igraca == 1) {
+            int steta = heroj.napad;
+
+            if (akcija_neprijatelja == 2) {
+                steta -= vanjski->odbrana;
+
+                /* Steta ne moze biti negativna */
+                if (steta < 0) {
+                    steta = 0;
+                }
+            }
+
+            vanjski->hp -= steta;
+
+            printf("\n\nNanio si neprijatelju %d stete.", steta);
+        }
+
+        /* Neprijatelj napada - ako igrac brani, steta se umanjuje za njegovu odbranu */
+        if (akcija_neprijatelja == 1) {
+            int steta = vanjski->napad;
+
+            if (akcija_igraca == 2) {
+                steta -= heroj.odbrana;
+
+                /* Steta ne moze biti negativna */
+                if (steta < 0) {
+                    steta = 0;
+                }
+            }
+
+            heroj.hp -= steta;
+
+            printf("\nNeprijatelj ti je nanio %d stete.", steta);
+        }
+
+        /* Provjeri da li je neprijatelj poginuo nakon ovog poteza */
+        if (vanjski->hp <= 0) {
+            /* povecaj brojac kada neprijatelj pogine */
+            ukupno_ubijenih++;
+            printf("\n\nPobijedio si neprijatelja!");
+            pauza();
+            return BORBA_POBJEDA;
+        }
+
+        /* Provjeri da li je igrac poginuo nakon ovog poteza */
+        if (heroj.hp <= 0) {
+            /* Eliksir zivota automatski spasava igraca ako ga ima u inventaru */
+            if (upotrebiEliksirAkoPostoji()) {
+                continue;
+            }
+
+            /* ispisi zavrsni ekran pri porazu */
+            ispisiZavrsniEkran(0);
+            exit(0);
+        }
+
+        /* Ni jedan nije poginuo - prikazi trenutno stanje i nastavi sledeci potez */
+        printf("\n\nStanje poslije akcija:");
+        printf("\nTvoj HP: %d/%d", heroj.hp, heroj.max_hp);
+        printf("\nNeprijatelj HP: %d", vanjski->hp);
+
+        pauza();
+    }
+
+    return BORBA_POBJEDA;
+}
+
 
 char map[MAX_ROWS][MAX_COLS];
 
