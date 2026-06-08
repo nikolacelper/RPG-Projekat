@@ -446,7 +446,56 @@ void napraviPredmet(Predmet *p, TipPredmeta tip) {
 }
 
 Predmet generisiNasumicanPredmet() {
+Predmet p;
 
+/* Generise nasumican broj od 0 do 9.
+   Svaki broj predstavlja jedan tip predmeta. */
+int r = rand() % 10;
+
+/* Na osnovu nasumicnog broja biramo koji predmet ce biti napravljen */
+if (r == 0) {
+    /* Narodni lek - obnavlja manju kolicinu HP-a */
+    napraviPredmet(&p, LEK_NARODNI);
+}
+else if (r == 1) {
+    /* Vilinski lek - obnavlja vecu kolicinu HP-a */
+    napraviPredmet(&p, LEK_VILINSKI);
+}
+else if (r == 2) {
+    /* Obican mac - daje manji bonus na napad */
+    napraviPredmet(&p, MAC_OBICAN);
+}
+else if (r == 3) {
+    /* Vitezov mac - daje veci bonus na napad, ali moze imati kaznu */
+    napraviPredmet(&p, MAC_VITEZOV);
+}
+else if (r == 4) {
+    /* Vatreni mac - daje najveci bonus na napad, ali skida HP po potezu */
+    napraviPredmet(&p, MAC_VATRENI);
+}
+else if (r == 5) {
+    /* Drveni stit - daje manji bonus na odbranu */
+    napraviPredmet(&p, STIT_DRVENI);
+}
+else if (r == 6) {
+    /* Gvozdeni stit - daje srednji bonus na odbranu */
+    napraviPredmet(&p, STIT_GVOZDENI);
+}
+else if (r == 7) {
+    /* Zmajski stit - daje najveci bonus na odbranu */
+    napraviPredmet(&p, STIT_ZMAJSKI);
+}
+else if (r == 8) {
+    /* Kljuc - koristi se za otkljucavanje zakljucanog izlaza */
+    napraviPredmet(&p, KLJUC);
+}
+else {
+    /* Eliksir zivota - automatski ozivljava igraca ako pogine */
+    napraviPredmet(&p, ELIKSIR_ZIVOTA);
+}
+
+/* Vraca napravljeni predmet funkciji koja ga je trazila */
+return p;
 }
 
 // Funkcija za opremanje mača i postavljanje kazne (HP gubitka) u zavisnosti od tipa mača
