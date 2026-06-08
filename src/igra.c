@@ -85,7 +85,11 @@ int garantovani_kljuc_y = -1;
 int garantovani_kljuc_x = -1;
 
 Igrac heroj = {
-
+ 100, 100,
+    10, 10,
+    10, 10,
+    0, 0, 0,
+    {{0}}, 0
 };
 
 void pauza() {
