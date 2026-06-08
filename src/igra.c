@@ -283,7 +283,11 @@ int garantovani_kljuc_y = -1;
 int garantovani_kljuc_x = -1;
 
 Igrac heroj = {
-
+ 100, 100,
+    10, 10,
+    10, 10,
+    0, 0, 0,
+    {{0}}, 0
 };
 
 void pauza() {
@@ -696,7 +700,295 @@ void pomjeriNeprijatelje() {
 }
 
 void novaIgra(int ucitaj_save) {
+/* Ako je izabran nastavak sacuvane igre, pokusavamo ucitati save.dat */
+if (ucitaj_save) {
+    if (!ucitajSacuvanuIgru()) {
+        printf("\nNije moguce ucitati sacuvanu igru.");
+        pauza();
+        return;
+    }
+}
+else {
+    /* Ako je nova igra, resetujemo osnovne parametre igraca */
+    heroj.hp = 100;
+    heroj.max_hp = 100;
 
+    heroj.osnovni_napad = 10;
+    heroj.osnovna_odbrana = 10;
+
+    heroj.napad = 10;
+    heroj.odbrana = 10;
+
+    /* Reset opreme: nema maca, nema kazne, nema stita */
+    heroj.bonus_maca = 0;
+    heroj.kazna_maca_po_potezu = 0;
+    heroj.bonus_stita = 0;
+
+    /* Prazan inventar na pocetku nove igre */
+    heroj.broj_predmeta = 0;
+
+    /* Reset broja ubijenih neprijatelja */
+    ukupno_ubijenih = 0;
+
+    /* Racuna konacni napad i odbranu na osnovu osnovnih vrijednosti i opreme */
+    izracunajStatistiku();
+
+    /* Ucitava prvi nivo iz fajla nivo1.txt */
+    if (!ucitajNivo(1)) {
+        pauza();
+        return;
+    }
+}
+
+/* Glavna petlja igre - vrti se dok igrac ne izadje ili ne zavrsi igru */
+while (1) {
+    /* Iscrtavanje mape, HP-a, inventara i ostalih podataka */
+    crtaj();
+
+    /* Citanje tastera bez potrebe za Enter */
+    char c = _getch();
+
+    /* Obrada izlaska iz igre */
+    if (c == 'q' || c == 'Q') {
+        printf("\nStvarno zelis da izadjes iz igre? (d/n): ");
+
+        char provera = _getch();
+
+        /* Ako igrac potvrdi izlaz, igra se cuva i izlazi se iz petlje */
+        if (provera == 'd' || provera == 'D') {
+            sacuvajIgru();
+            pauza();
+            break;
+        }
+        else {
+            continue;
+        }
+    }
+
+    /* Otvaranje inventara */
+    if (c == 'i' || c == 'I') {
+        prikaziInventar();
+        continue;
+    }
+
+    /* Pocetna nova pozicija je trenutna pozicija igraca */
+    int nx = px;
+    int ny = py;
+
+    /* Odredjivanje nove pozicije na osnovu WASD tastera */
+    if (c == 'w' || c == 'W') {
+        ny--;
+    }
+    else if (c == 's' || c == 'S') {
+        ny++;
+    }
+    else if (c == 'a' || c == 'A') {
+        nx--;
+    }
+    else if (c == 'd' || c == 'D') {
+        nx++;
+    }
+    else {
+        /* Ako nije pritisnut validan taster za kretanje, ignorise se */
+        continue;
+    }
+
+    /* Provjera da li nova pozicija izlazi van granica mape */
+    if (ny < 0 || ny >= rows || nx < 0 || nx >= strlen(map[ny])) {
+        continue;
+    }
+
+    /* Uzimamo znak sa polja na koje igrac pokusava da stane */
+    char polje = map[ny][nx];
+
+    /* Zid - igrac ne moze proci */
+    if (polje == '#') {
+        continue;
+    }
+
+    /* Ako je na polju neprijatelj, pokrece se borba */
+    if (polje == 'E') {
+        /* Ako neprijatelj jos nema svoje sacuvane podatke, generise se */
+        if (!neprijatelj_aktivan[ny][nx]) {
+            neprijatelj_tabela[ny][nx] = generisiNeprijatelja();
+            neprijatelj_aktivan[ny][nx] = 1;
+        }
+
+        /* Pokretanje borbe sa neprijateljem na toj poziciji */
+        int rezultat = pokreniBorbu(&neprijatelj_tabela[ny][nx]);
+
+        /* Ako je igrac pobijedio, neprijatelj se uklanja sa mape */
+        if (rezultat == BORBA_POBJEDA) {
+            neprijatelj_aktivan[ny][nx] = 0;
+            map[ny][nx] = '.';
+
+            /* Igrac prelazi na polje gdje je bio neprijatelj */
+            map[py][px] = '.';
+            px = nx;
+            py = ny;
+            map[py][px] = '@';
+
+            /* Poslije poteza se provjerava kazna maca i pomjeraju neprijatelji */
+            provjeriKaznuMaca();
+            pomjeriNeprijatelje();
+        }
+        else if (rezultat == BORBA_BEKSTVO_NEPRIJATELJA) {
+            /* Ako neprijatelj pobjegne, trazimo slobodno susjedno polje */
+            int dx[] = {0, 0, 1, -1};
+            int dy[] = {-1, 1, 0, 0};
+
+            /* Mijesanje smjerova da bjekstvo bude nasumicno */
+            for (int k = 3; k > 0; k--) {
+                int j = rand() % (k + 1);
+                int tmp;
+
+                tmp = dx[k];
+                dx[k] = dx[j];
+                dx[j] = tmp;
+
+                tmp = dy[k];
+                dy[k] = dy[j];
+                dy[j] = tmp;
+            }
+
+            int premjesten = 0;
+
+            /* Pokusaj premjestanja neprijatelja na jedno od 4 susjedna polja */
+            for (int k = 0; k < 4; k++) {
+                int enx = nx + dx[k];
+                int eny = ny + dy[k];
+
+                /* Provjera granica mape */
+                if (eny < 0 || eny >= rows) continue;
+                if (enx < 0 || enx >= (int)strlen(map[eny])) continue;
+
+                /* Neprijatelj moze pobjeci samo na prazno polje */
+                if (map[eny][enx] != '.') continue;
+
+                /* Prenosimo podatke neprijatelja na novu poziciju */
+                neprijatelj_tabela[eny][enx] = neprijatelj_tabela[ny][nx];
+                neprijatelj_aktivan[eny][enx] = 1;
+                neprijatelj_aktivan[ny][nx] = 0;
+
+                /* Azuriranje mape */
+                map[ny][nx] = '.';
+                map[eny][enx] = 'E';
+
+                premjesten = 1;
+                break;
+            }
+
+            /* Ako nema slobodnog polja, neprijatelj ostaje gdje jeste */
+            if (!premjesten) { }
+
+            /* Igrac ulazi na polje gdje je neprijatelj bio */
+            map[py][px] = '.';
+            px = nx;
+            py = ny;
+            map[py][px] = '@';
+
+            provjeriKaznuMaca();
+            pomjeriNeprijatelje();
+        }
+        else if (rezultat == BORBA_BEKSTVO_IGRACA) {
+            /* Ako igrac pobjegne, ne mijenja se pozicija */
+            continue;
+        }
+    }
+    else if (polje == '$') {
+        /* Polje sa predmetom */
+        Predmet novi_predmet;
+
+        /* Ako je ovo garantovana kutija sa kljucem, pravi se kljuc */
+        if (ny == garantovani_kljuc_y && nx == garantovani_kljuc_x) {
+            napraviPredmet(&novi_predmet, KLJUC);
+            garantovani_kljuc_y = -1;
+            garantovani_kljuc_x = -1;
+        }
+        else {
+            /* U suprotnom se generise nasumican predmet */
+            novi_predmet = generisiNasumicanPredmet();
+        }
+
+        /* Dodavanje predmeta u inventar */
+        dodajPredmet(novi_predmet);
+
+        /* Kutija nestaje sa mape */
+        map[ny][nx] = '.';
+
+        /* Igrac prelazi na polje predmeta */
+        map[py][px] = '.';
+        px = nx;
+        py = ny;
+        map[py][px] = '@';
+
+        provjeriKaznuMaca();
+        pomjeriNeprijatelje();
+    }
+    else if (polje == '?') {
+        /* Misteriozni napitak - moze povecati ili smanjiti napad/odbranu */
+        misteriozniNapitak();
+
+        /* Napitak se uklanja sa mape */
+        map[ny][nx] = '.';
+
+        /* Igrac prelazi na to polje */
+        map[py][px] = '.';
+        px = nx;
+        py = ny;
+        map[py][px] = '@';
+
+        provjeriKaznuMaca();
+        pomjeriNeprijatelje();
+    }
+    else if (polje == 'L') {
+        /* Zakljucan izlaz - potreban je kljuc */
+        int indeks_kljuca = imaKljuc();
+
+        if (indeks_kljuca == -1) {
+            printf("\nOvaj izlaz je zakljucan. Potreban ti je kljuc.");
+            pauza();
+            continue;
+        }
+
+        /* Ako igrac ima kljuc, uklanja se iz inventara i prelazi se nivo */
+        printf("\nOtkljucao si izlaz pomocu kljuca!");
+        ukloniPredmet(indeks_kljuca);
+        pauza();
+
+        predjiNaSljedeciNivo();
+        continue;
+    }
+    else if (polje == '>') {
+        /*
+           Obican izlaz.
+           Na zadnjem nivou dodatno trazimo kljuc da bi igrac zavrsio igru.
+        */
+        if (trenutni_nivo == UKUPNO_NIVOA && imaKljuc() == -1) {
+            printf("\nOva vrata su zakljucana. Potreban ti je kljuc da izadjes!");
+            pauza();
+            continue;
+        }
+
+        /* Ako je zadnji nivo i igrac ima kljuc, kljuc se trosi */
+        if (trenutni_nivo == UKUPNO_NIVOA) {
+            ukloniPredmet(imaKljuc());
+        }
+
+        predjiNaSljedeciNivo();
+        continue;
+    }
+    else {
+        /* Obicno prazno polje - igrac se samo pomjera */
+        map[py][px] = '.';
+        px = nx;
+        py = ny;
+        map[py][px] = '@';
+
+        provjeriKaznuMaca();
+        pomjeriNeprijatelje();
+    }
+}
 }
 
 void uputstvo() {
