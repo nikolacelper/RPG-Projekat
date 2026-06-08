@@ -787,9 +787,85 @@ void prikaziInventar() {
 
 }
 
-void misteriozniNapitak() {
 
+void misteriozniNapitak() {
+    system("cls");
+
+    printf("Pronasao si misteriozni napitak!");
+    printf("\nNe znas da li je carobni napitak ili otrov.");
+    printf("\nDa li ces ga popiti? [d/n]: ");
+
+    char izbor = _getch();
+
+    int caroban = rand() % 2;
+    int napad_ili_odbrana = rand() % 2;
+    int bonus = (rand() % 11) + 5;
+
+    if (izbor == 'd' || izbor == 'D') {
+        if (caroban) {
+            if (napad_ili_odbrana == 0) {
+                heroj.osnovni_napad += bonus;
+                printf("\n\nCarobni napitak!");
+                printf("\nNapad +%d", bonus);
+            }
+            else {
+                heroj.osnovna_odbrana += bonus;
+                printf("\n\nCarobni napitak!");
+                printf("\nOdbrana +%d", bonus);
+            }
+        }
+        else {
+            if (napad_ili_odbrana == 0) {
+                heroj.osnovni_napad -= bonus;
+
+                if (heroj.osnovni_napad < 1) {
+                    heroj.osnovni_napad = 1;
+                }
+
+                printf("\n\nOtrov!");
+                printf("\nNapad -%d", bonus);
+            }
+            else {
+                heroj.osnovna_odbrana -= bonus;
+
+                if (heroj.osnovna_odbrana < 0) {
+                    heroj.osnovna_odbrana = 0;
+                }
+
+                printf("\n\nOtrov!");
+                printf("\nOdbrana -%d", bonus);
+            }
+        }
+    }
+    else {
+        printf("\n\nProsuo si napitak.");
+
+        if (caroban) {
+            if (napad_ili_odbrana == 0) {
+                printf("\nNjegovo dejstvo je bilo: Napad +%d", bonus);
+            }
+            else {
+                printf("\nNjegovo dejstvo je bilo: Odbrana +%d", bonus);
+            }
+        }
+        else {
+            if (napad_ili_odbrana == 0) {
+                printf("\nNjegovo dejstvo je bilo: Napad -%d", bonus);
+            }
+            else {
+                printf("\nNjegovo dejstvo je bilo: Odbrana -%d", bonus);
+            }
+        }
+    }
+
+    izracunajStatistiku();
+
+    printf("\n\nTrenutni napad: %d", heroj.napad);
+    printf("\nTrenutna odbrana: %d", heroj.odbrana);
+
+    pauza();
 }
+
 
 Neprijatelj generisiNeprijatelja() {
 
