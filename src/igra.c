@@ -121,7 +121,48 @@ int upotrebiEliksirAkoPostoji() {
 }
 
 void napraviPredmet(Predmet *p, TipPredmeta tip) {
+  p->tip = tip;
 
+    if (tip == LEK_NARODNI) {
+        strcpy(p->naziv, "Narodni lek");
+        p->bonus = 10;
+    }
+    else if (tip == LEK_VILINSKI) {
+        strcpy(p->naziv, "Vilinski lek");
+        p->bonus = 20;
+    }
+    else if (tip == MAC_OBICAN) {
+        strcpy(p->naziv, "Obican mac");
+        p->bonus = 5;
+    }
+    else if (tip == MAC_VITEZOV) {
+        strcpy(p->naziv, "Vitezov mac");
+        p->bonus = 15;
+    }
+    else if (tip == MAC_VATRENI) {
+        strcpy(p->naziv, "Vatreni mac");
+        p->bonus = 25;
+    }
+    else if (tip == STIT_DRVENI) {
+        strcpy(p->naziv, "Drveni stit");
+        p->bonus = 5;
+    }
+    else if (tip == STIT_GVOZDENI) {
+        strcpy(p->naziv, "Gvozdeni stit");
+        p->bonus = 10;
+    }
+    else if (tip == STIT_ZMAJSKI) {
+        strcpy(p->naziv, "Zmajski stit");
+        p->bonus = 15;
+    }
+    else if (tip == KLJUC) {
+        strcpy(p->naziv, "Kljuc");
+        p->bonus = 0;
+    }
+    else if (tip == ELIKSIR_ZIVOTA) {
+        strcpy(p->naziv, "Eliksir zivota");
+        p->bonus = 0;
+    }
 }
 
 Predmet generisiNasumicanPredmet() {
