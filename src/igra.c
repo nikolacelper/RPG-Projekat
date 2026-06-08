@@ -260,6 +260,38 @@ int pokreniBorbu(Neprijatelj *vanjski) {
 
     return BORBA_POBJEDA;
 }
+int pokreniBorbu(Neprijatelj *vanjski);
+
+int pronadjiEliksir() {
+    for (int i = 0; i < heroj.broj_predmeta; i++) {
+        if (heroj.inventar[i].tip == ELIKSIR_ZIVOTA) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+
+int upotrebiEliksirAkoPostoji() {
+    int indeks = pronadjiEliksir();
+
+    if (indeks == -1) {
+        return 0;
+    }
+
+    printf("\nAktiviran je Eliksir zivota!");
+    printf("\nVracen si u zivot sa %d HP.", heroj.max_hp / 2);
+
+    heroj.hp = heroj.max_hp / 2;
+    ukloniPredmet(indeks);
+
+    pauza();
+
+    return 1;
+}
+
+
 
 
 char map[MAX_ROWS][MAX_COLS];
