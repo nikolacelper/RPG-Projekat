@@ -431,9 +431,44 @@ void misteriozniNapitak() {
 
 Neprijatelj generisiNeprijatelja() {
 
+      Neprijatelj n;
+
+    int r = rand() % 3;
+
+    if (trenutni_nivo == 1) {
+        if (r == 0)      strcpy(n.naziv, "Goblin");
+        else if (r == 1) strcpy(n.naziv, "Vuk");
+        else             strcpy(n.naziv, "Lopov");
+    }
+    else if (trenutni_nivo == 2) {
+        if (r == 0)      strcpy(n.naziv, "Ork");
+        else if (r == 1) strcpy(n.naziv, "Pecinski pauk");
+        else             strcpy(n.naziv, "Mracni strazar");
+    }
+    else if (trenutni_nivo == 3) {
+        if (r == 0)      strcpy(n.naziv, "Trol");
+        else if (r == 1) strcpy(n.naziv, "Crni vitez");
+        else             strcpy(n.naziv, "Otrovan duh");
+    }
+    else if (trenutni_nivo == 4) {
+        if (r == 0)      strcpy(n.naziv, "Vatreni demon");
+        else if (r == 1) strcpy(n.naziv, "Kameni cuvar");
+        else             strcpy(n.naziv, "Sjena");
+    }
+    else {
+        if (r == 0)      strcpy(n.naziv, "Zmajev sluga");
+        else if (r == 1) strcpy(n.naziv, "Gospodar lavirinta");
+        else             strcpy(n.naziv, "Drevni demon");
+    }
+
+    n.hp      = (rand() % 50) + 1;
+    n.napad   = (rand() % 12) + 1;
+    n.odbrana = (rand() % 8);
+
+    return n;
 }
 
-/* NOVO - linija 546: pomocna funkcija za ispis zavrsnog ekrana */
+
 void ispisiZavrsniEkran(int pobjeda) {
 
 }
