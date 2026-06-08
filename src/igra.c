@@ -765,6 +765,29 @@ void provjeriKaznuMaca() {
 }
 
 void predjiNaSljedeciNivo() {
+    // Provera da li postoji sledeći nivo za učitavanje
+     if (trenutni_nivo < UKUPNO_NIVOA) {
+        int sljedeci_nivo = trenutni_nivo + 1;
+
+        system("cls");
+
+        printf("Pronasao si izlaz!");
+        printf("\nPrelazak na nivo %d.", sljedeci_nivo);
+
+        pauza();
+
+        if (!ucitajNivo(sljedeci_nivo)) {
+            // Poruka o grešci ako nivo ne može da se učita
+            printf("\nNe mogu da ucitam nivo %d.", sljedeci_nivo);
+            pauza();
+            exit(1);
+        }
+    }
+    else {
+         // Igrač je završio poslednji nivo - prikaz završnog ekrana za pobedu
+        ispisiZavrsniEkran(1);
+        exit(0);
+    }
 
 }
 
