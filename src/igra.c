@@ -256,14 +256,72 @@ int ucitajNivo(int broj_nivoa) {
 
 void postaviBoju(int boja) {
 
+     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), boja);
+
 }
 
 void crtajPolje(char polje) {
+    if (polje == '#') {
+        postaviBoju(8);
+        printf("%c", 219);
+    }
+    else if (polje == '@') {
+        postaviBoju(10);
+        printf("@");
+    }
+    else if (polje == 'E') {
+        postaviBoju(12);
+        printf("E");
+    }
+    else if (polje == '$') {
+        postaviBoju(14);
+        printf("$");
+    }
+    else if (polje == '?') {
+        postaviBoju(13);
+        printf("?");
+    }
+    else if (polje == '>') {
+        postaviBoju(11);
+        printf(">");
+    }
+    else if (polje == 'L') {
+        postaviBoju(9);
+        printf("L");
+    }
+    else {
+        postaviBoju(7);
+        printf(" ");
+    }
+
+    postaviBoju(7);
 
 }
 
 void crtaj() {
+system("cls");
 
+    printf("NIVO %d/%d\n", trenutni_nivo, UKUPNO_NIVOA);
+
+    iscrtajHPBar(heroj.hp, heroj.max_hp);
+
+    printf("Napad: %d  Odbrana: %d\n", heroj.napad, heroj.odbrana);
+    printf("Kazna maca po potezu: %d HP\n", heroj.kazna_maca_po_potezu);
+
+    prikaziKratakInventar();
+
+    printf("----------------------------------\n");
+
+    for (int i = 0; i < rows; i++) {
+    for (int j = 0; map[i][j] != '\0'; j++) {
+        crtajPolje(map[i][j]);
+    }
+    printf("\n");
+}
+
+    printf("----------------------------------\n");
+    printf("WASD - kretanje | I - inventar | Q - izlaz\n");
+    printf("# zid | E neprijatelj | $ predmet | ? napitak | > izlaz | L zakljucan izlaz\n");
 }
 
 void provjeriKaznuMaca() {
