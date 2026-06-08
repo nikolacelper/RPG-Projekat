@@ -166,7 +166,7 @@ int pokreniBorbu(Neprijatelj *vanjski) {
 }
 
 int ucitajNivo(int broj_nivoa) {
-    char ime_fajla[30];
+ char ime_fajla[30];
 
     sprintf(ime_fajla, "nivo%d.txt", broj_nivoa);
 
@@ -242,6 +242,7 @@ int ucitajNivo(int broj_nivoa) {
 
         if (broj_kutija > 0) {
             int izbor = rand() % broj_kutija;
+        
             garantovani_kljuc_y = kutija_y[izbor];
             garantovani_kljuc_x = kutija_x[izbor];
         }
@@ -251,7 +252,7 @@ int ucitajNivo(int broj_nivoa) {
 
     return 1;
 
-
+    
 }
 
 void postaviBoju(int boja) {
@@ -341,7 +342,7 @@ void novaIgra(int ucitaj_save) {
 }
 
 void uputstvo() {
-void uputstvo() {
+
     system("cls");
 
     printf("=== UPUTSTVO ===\n\n");
@@ -373,7 +374,7 @@ void uputstvo() {
 
     pauza();
 }
-}
+
 
 void sacuvajIgru() {
 
@@ -384,7 +385,68 @@ int ucitajSacuvanuIgru() {
 }
 
 void meni() {
+    while (1) {
+        system("cls");
 
+        printf("=== RPG LAVIRINT ===\n\n");
+
+        // Provera da li postoji save fajl i pravilno zatvaranje fajla
+        FILE *f = fopen("save.dat", "r");
+        int ima_save = (f != NULL);
+        if (ima_save) {
+            fclose(f); 
+        }
+
+        // Prikaz menija
+        if (ima_save) {
+            printf("1 - Nova igra\n");
+            printf("2 - Nastavi sacuvanu igru\n");
+            printf("3 - Uputstvo\n");
+            printf("0 - Izlaz\n\n");
+        } else {
+            printf("1 - Nova igra\n");
+            printf("2 - Uputstvo\n");
+            printf("0 - Izlaz\n\n");
+        }
+
+        printf("Izbor: ");
+        char izbor = _getch();
+
+        // Glavna logika menija preko switch-a
+        switch (izbor) {
+            case '1':
+                if (ima_save) {
+                    remove("save.dat");
+                }
+                novaIgra(0);
+                break;
+
+            case '2':
+                if (ima_save) {
+                    novaIgra(1); // Ako ima save, 2 je "Nastavi"
+                } else {
+                    uputstvo();  // Ako nema save, 2 je "Uputstvo"
+                }
+                break;
+
+            case '3':
+                if (ima_save) {
+                    uputstvo(); // Opcija 3 postoji samo ako ima save fajla
+                } else {
+                    printf("\nPogresan izbor.");
+                    pauza();
+                }
+                break;
+
+            case '0':
+                return; // Izlaz iz funkcije i prekid while petlje
+
+            default:
+                printf("\nPogresan izbor.");
+                pauza();
+                break;
+        }
+    }
 }
 
 int main() {
