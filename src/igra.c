@@ -337,6 +337,18 @@ void iscrtajHPBar(int hp, int max_hp) {
 }
 
 void prikaziKratakInventar() {
+    printf("Inventar: ");
+
+    for (int i = 0; i < MAX_INVENTAR; i++) {
+        if (i < heroj.broj_predmeta) {
+            printf("[%s] ", heroj.inventar[i].naziv);
+        }
+        else {
+            printf("[ ] ");
+        }
+    }
+
+    printf("\n");
 
 }
 
@@ -422,6 +434,117 @@ void dodajPredmet(Predmet p) {
 }
 
 void prikaziInventar() {
+    while (1) {
+        system("cls");
+
+        printf("=== INVENTAR (%d/%d) ===\n", heroj.broj_predmeta, MAX_INVENTAR);
+        iscrtajHPBar(heroj.hp, heroj.max_hp);
+        printf("Napad: %d | Odbrana: %d\n", heroj.napad, heroj.odbrana);
+        printf("----------------------------------\n");
+
+        if (heroj.broj_predmeta == 0) {
+            printf("Inventar je prazan.\n");
+        }
+        else {
+            for (int i = 0; i < heroj.broj_predmeta; i++) {
+                printf("%d. %s\n", i + 1, heroj.inventar[i].naziv);
+            }
+        }
+
+        printf("----------------------------------\n");
+        printf("Izaberi broj predmeta za koriscenje/opremanje.\n");
+        printf("0 - Povratak u igru\n");
+        printf("O - Odbaci predmet\n");
+        printf("Izbor: ");
+
+        char izbor = _getch();
+
+        if (izbor == '0') {
+            return;
+        }
+
+        if (izbor == 'o' || izbor == 'O') {
+            if (heroj.broj_predmeta == 0) {
+                printf("\nInventar je prazan, nema sta da odbacis.");
+                pauza();
+                continue;
+            }
+
+            printf("\nKoji predmet odbacujes? (1-%d, 0 - odustani): ", heroj.broj_predmeta);
+            char izbor_odbaci = _getch();
+
+            if (izbor_odbaci == '0') {
+                continue;
+            }
+
+            int indeks_odbaci = izbor_odbaci - '1';
+
+            if (indeks_odbaci < 0 || indeks_odbaci >= heroj.broj_predmeta) {
+                printf("\nPogresan izbor.");
+                pauza();
+                continue;
+            }
+
+            printf("\nSigurno zelis da odbacis: %s? (d/n): ", heroj.inventar[indeks_odbaci].naziv);
+            char potvrda = _getch();
+
+            if (potvrda == 'd' || potvrda == 'D') {
+                printf("\nOdbacio si: %s", heroj.inventar[indeks_odbaci].naziv);
+                ukloniPredmet(indeks_odbaci);
+            }
+            else {
+                printf("\nOdustao si od odbacivanja.");
+            }
+
+            pauza();
+            continue;
+        }
+
+        int indeks = izbor - '1';
+
+        if (indeks < 0 || indeks >= heroj.broj_predmeta) {
+            printf("\nPogresan izbor.");
+            pauza();
+            continue;
+        }
+
+        Predmet p = heroj.inventar[indeks];
+
+        if (p.tip == LEK_NARODNI || p.tip == LEK_VILINSKI) {
+            heroj.hp += p.bonus;
+
+            if (heroj.hp > heroj.max_hp) {
+                heroj.hp = heroj.max_hp;
+            }
+
+            printf("\nIskoristio si: %s", p.naziv);
+            printf("\nHP je sada: %d/%d", heroj.hp, heroj.max_hp);
+
+            ukloniPredmet(indeks);
+        }
+        else if (p.tip == MAC_OBICAN || p.tip == MAC_VITEZOV || p.tip == MAC_VATRENI) {
+            opremiMac(p);
+
+            printf("\nOpremio si: %s", p.naziv);
+            printf("\nNapad je sada: %d", heroj.napad);
+            printf("\nGubitak HP po potezu: %d", heroj.kazna_maca_po_potezu);
+        }
+        else if (p.tip == STIT_DRVENI || p.tip == STIT_GVOZDENI || p.tip == STIT_ZMAJSKI) {
+            opremiStit(p);
+
+            printf("\nOpremio si: %s", p.naziv);
+            printf("\nOdbrana je sada: %d", heroj.odbrana);
+        }
+        else if (p.tip == KLJUC) {
+            printf("\nKljuc se ne koristi rucno.");
+            printf("\nOn se automatski koristi kod zakljucanog izlaza.");
+        }
+        else if (p.tip == ELIKSIR_ZIVOTA) {
+            printf("\nEliksir zivota se koristi automatski ako pogines u borbi.");
+        }
+
+        pauza();
+    }
 
 }
 
