@@ -1700,5 +1700,14 @@ void meni() {
 }
 
 int main() {
+       srand(time(NULL));
+
+    for (int y = 0; y < MAX_ROWS; y++)
+        for (int x = 0; x < MAX_COLS; x++)
+            neprijatelj_aktivan[y][x] = 0;
+
+    meni();
+
+    return 0;
 
 }
