@@ -449,20 +449,118 @@ Predmet generisiNasumicanPredmet() {
 
 }
 
+// Funkcija za opremanje mača i postavljanje kazne (HP gubitka) u zavisnosti od tipa mača
 void opremiMac(Predmet p) {
+    // Postavlja se bonus na napad koji mač donosi
+    heroj.bonus_maca = p.bonus;
 
+    // Provera tipa mača i dodeljivanje odgovarajuće kazne po potezu
+    if (p.tip == MAC_OBICAN) {
+        heroj.kazna_maca_po_potezu = 0;
+    }
+    else if (p.tip == MAC_VITEZOV) {
+        heroj.kazna_maca_po_potezu = 5;
+    }
+    else if (p.tip == MAC_VATRENI) {
+        heroj.kazna_maca_po_potezu = 10;
+    }
+
+    // Ponovno računanje ukupne statistike heroja nakon promene opreme
+    izracunajStatistiku();
 }
 
+// Funkcija za opremanje štita
 void opremiStit(Predmet p) {
-
+    // Postavlja se bonus na odbranu koji štit donosi
+    heroj.bonus_stita = p.bonus;
+    
+    // Osvežavanje statistike heroja
+    izracunajStatistiku();
 }
 
+// Funkcija koja pita igrača da li želi odmah da opremi predmet koji je pronašao
 void pitajZaOpremanje(Predmet p) {
+    // Provera da li je pronađeni predmet mač
+    if (p.tip == MAC_OBICAN || p.tip == MAC_VITEZOV || p.tip == MAC_VATRENI) {
+        printf("\n\nZelis li da koristis ovaj mac? (d/n): ");
+        char izbor = _getch(); // Hvatanje pritiska na taster bez čekanja Enter-a
 
+        // Ako je odgovor potvrdan (malo ili veliko 'D')
+        if (izbor == 'd' || izbor == 'D') {
+            opremiMac(p);
+
+            // Ispis informacija o novom stanju heroja
+            printf("\nOpremio si: %s", p.naziv);
+            printf("\nNapad je sada: %d", heroj.napad);
+            printf("\nGubitak HP po potezu: %d", heroj.kazna_maca_po_potezu);
+        }
+    }
+    // Provera da li je pronađeni predmet štit
+    else if (p.tip == STIT_DRVENI || p.tip == STIT_GVOZDENI || p.tip == STIT_ZMAJSKI) {
+        printf("\n\nZelis li da koristis ovaj stit? (d/n): ");
+        char izbor = _getch();
+
+        if (izbor == 'd' || izbor == 'D') {
+            opremiStit(p);
+
+            printf("\nOpremio si: %s", p.naziv);
+            printf("\nOdbrana je sada: %d", heroj.odbrana);
+        }
+    }
 }
 
+// Glavna funkcija za dodavanje predmeta u inventar heroja
 void dodajPredmet(Predmet p) {
+    system("cls"); // Čišćenje ekrana
 
+    printf("Pronadjen predmet: %s\n", p.naziv);
+
+    // Logika za upravljanje punim inventarom
+    if (heroj.broj_predmeta >= MAX_INVENTAR) {
+        printf("\nInventar je pun. Moras odbaciti jedan predmet.\n\n");
+
+        // Ispisivanje trenutnih predmeta u inventaru (indeksirani od 1)
+        for (int i = 0; i < heroj.broj_predmeta; i++) {
+            printf("%d. %s\n", i + 1, heroj.inventar[i].naziv);
+        }
+
+        printf("\n0 - Ne uzimaj novi predmet");
+        printf("\nKoji predmet odbacujes? ");
+
+        char izbor = _getch();
+
+        // Igrač je odlučio da zadrži stari inventar i odbaci novi predmet
+        if (izbor == '0') {
+            printf("\nNisi pokupio novi predmet.");
+            pauza();
+            return; // Prekid funkcije
+        }
+
+        // Pretvaranje karaktera u indeks niza (npr. '1' postaje 0)
+        int indeks = izbor - '1';
+
+        // Validacija unosa (da li je izabran postojeći indeks)
+        if (indeks < 0 || indeks >= heroj.broj_predmeta) {
+            printf("\nPogresan izbor. Novi predmet nije pokupljen.");
+            pauza();
+            return;
+        }
+
+        // Uklanjanje izabranog predmeta da bi se oslobodilo mesto
+        printf("\nOdbacio si: %s", heroj.inventar[indeks].naziv);
+        ukloniPredmet(indeks);
+    }
+
+    // Dodavanje novog predmeta na prvo slobodno mesto u inventaru
+    heroj.inventar[heroj.broj_predmeta] = p;
+    heroj.broj_predmeta++;
+
+    printf("\nPokupio si: %s", p.naziv);
+
+    // Ponuda igraču da odmah opremi tek pokupljeni predmet
+    pitajZaOpremanje(p);
+
+    pauza();
 }
 
 void prikaziInventar() {
