@@ -625,6 +625,39 @@ Neprijatelj generisiNeprijatelja() {
 
 
 void ispisiZavrsniEkran(int pobjeda) {
+     system("cls");
+
+    if (pobjeda) {
+        printf("==========================================\n");
+        printf("           *** CESTITAM! ***             \n");
+        printf("        Pobijedio si sve neprijatelje!   \n");
+        printf("==========================================\n\n");
+    }
+    else {
+        printf("==========================================\n");
+        printf("             *** GAME OVER ***           \n");
+        printf("          Izgubio si borbu...            \n");
+        printf("==========================================\n\n");
+    }
+
+    printf("--- STATISTIKE PARTIJE ---\n\n");
+    printf("Dostignut nivo      : %d / %d\n", trenutni_nivo, UKUPNO_NIVOA);
+    printf("Ubijenih neprijatelja: %d\n", ukupno_ubijenih);   /* NOVO - linija 569 */
+    printf("\n--- STANJE IGRACA ---\n\n");
+    printf("HP                  : %d / %d\n", heroj.hp, heroj.max_hp);
+    printf("Napad               : %d\n", heroj.napad);
+    printf("Odbrana             : %d\n", heroj.odbrana);
+    printf("Predmeta u inventaru: %d / %d\n", heroj.broj_predmeta, MAX_INVENTAR);
+
+    if (heroj.broj_predmeta > 0) {
+        printf("\nInventar:\n");
+        for (int i = 0; i < heroj.broj_predmeta; i++) {
+            printf("  %d. %s\n", i + 1, heroj.inventar[i].naziv);
+        }
+    }
+
+    printf("\n==========================================\n");
+    pauza();
 
 }
 
