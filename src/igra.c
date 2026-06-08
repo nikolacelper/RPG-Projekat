@@ -607,6 +607,91 @@ void predjiNaSljedeciNivo() {
 }
 
 void pomjeriNeprijatelje() {
+     if (trenutni_nivo < 3) {
+        return;
+    }
+
+    int dx[] = {0, 0, 1, -1};
+    int dy[] = {-1, 1, 0, 0};
+
+    char stara_mapa[MAX_ROWS][MAX_COLS];
+    for (int i = 0; i < rows; i++) {
+        strcpy(stara_mapa[i], map[i]);
+    }
+
+    for (int y = 0; y < rows; y++) {
+        for (int x = 0; stara_mapa[y][x] != '\0'; x++) {
+            if (stara_mapa[y][x] != 'E') {
+                continue;
+            }
+
+            int redosljed[4] = {0, 1, 2, 3};
+            for (int k = 3; k > 0; k--) {
+                int j = rand() % (k + 1);
+                int tmp = redosljed[k];
+                redosljed[k] = redosljed[j];
+                redosljed[j] = tmp;
+            }
+
+            for (int k = 0; k < 4; k++) {
+                int smjer = redosljed[k];
+                int enx = x + dx[smjer];
+                int eny = y + dy[smjer];
+
+                if (eny < 0 || eny >= rows) continue;
+                if (enx < 0 || enx >= (int)strlen(map[eny])) continue;
+
+                char ciljno = map[eny][enx];
+
+                if (ciljno == '@') {
+                    system("cls");
+                    printf("Neprijatelj te je napao!\n");
+                    pauza();
+
+                    if (!neprijatelj_aktivan[y][x]) {
+                        neprijatelj_tabela[y][x] = generisiNeprijatelja();
+                        neprijatelj_aktivan[y][x] = 1;
+                    }
+
+                    int rezultat = pokreniBorbu(&neprijatelj_tabela[y][x]);
+
+                    if (rezultat == BORBA_POBJEDA) {
+                        neprijatelj_aktivan[y][x] = 0;
+                        map[y][x] = '.';
+                    }
+                    else if (rezultat == BORBA_BEKSTVO_NEPRIJATELJA) {
+                        int premjesten = 0;
+                        for (int m = 0; m < 4; m++) {
+                            int bnx = x + dx[m];
+                            int bny = y + dy[m];
+                            if (bny < 0 || bny >= rows) continue;
+                            if (bnx < 0 || bnx >= (int)strlen(map[bny])) continue;
+                            if (map[bny][bnx] != '.') continue;
+                            neprijatelj_tabela[bny][bnx] = neprijatelj_tabela[y][x];
+                            neprijatelj_aktivan[bny][bnx] = 1;
+                            neprijatelj_aktivan[y][x] = 0;
+                            map[y][x] = '.';
+                            map[bny][bnx] = 'E';
+                            premjesten = 1;
+                            break;
+                        }
+                        if (!premjesten) { }
+                    }
+                    else { }
+                    break;
+                }
+
+                if (ciljno == '.') {
+                    neprijatelj_tabela[eny][enx] = neprijatelj_tabela[y][x];
+                    neprijatelj_aktivan[eny][enx] = neprijatelj_aktivan[y][x];
+                    neprijatelj_aktivan[y][x] = 0;
+                    map[y][x] = '.';
+                    map[eny][enx] = 'E';
+                    break;
+                }
+            }
+        }
+    }
 
 }
 
