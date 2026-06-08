@@ -452,11 +452,82 @@ void uputstvo() {
 
 
 void sacuvajIgru() {
+    FILE *f = fopen("save.dat", "w"); 
+
+    if (f == NULL) {
+        printf("\nGreska: nije moguce sacuvati igru.");
+        return;
+    }
+
+    fprintf(f, "%d %d\n", heroj.hp, heroj.max_hp);
+    fprintf(f, "%d %d\n", heroj.osnovni_napad, heroj.osnovna_odbrana);
+    fprintf(f, "%d %d\n", heroj.napad, heroj.odbrana);
+    fprintf(f, "%d %d %d\n", heroj.bonus_maca, heroj.kazna_maca_po_potezu, heroj.bonus_stita);
+    fprintf(f, "%d\n", heroj.broj_predmeta);
+
+    for (int i = 0; i < heroj.broj_predmeta; i++) {
+        fprintf(f, "%d %d %s\n", heroj.inventar[i].tip, heroj.inventar[i].bonus, heroj.inventar[i].naziv);
+    }
+
+    fprintf(f, "%d %d %d\n", px, py, trenutni_nivo);
+
+    fprintf(f, "%d\n", rows);
+    for (int i = 0; i < rows; i++) {
+        fprintf(f, "%s\n", map[i]);
+    }
+
+    /* NOVO - linija 1228: sacuvaj i broj ubijenih da se ne izgubi pri nastavku */
+    fprintf(f, "%d\n", ukupno_ubijenih);
+
+    // Zatvaranje fajla nakon upisa
+    fclose(f);
+
+    printf("\nIgra je sacuvana.");
 
 }
 
-int ucitajSacuvanuIgru() {
 
+
+int ucitajSacuvanuIgru() {
+   // Otvaranje fajla za čitanje
+    FILE *f = fopen("save.dat", "r");
+
+    if (f == NULL) {
+        // Provera da li je fajl uspešno otvoren
+        return 0;
+    }
+
+    // Učitavanje osnovnih podataka o heroju
+    fscanf(f, "%d %d\n", &heroj.hp, &heroj.max_hp);
+    fscanf(f, "%d %d\n", &heroj.osnovni_napad, &heroj.osnovna_odbrana);
+    fscanf(f, "%d %d\n", &heroj.napad, &heroj.odbrana);
+    fscanf(f, "%d %d %d\n", &heroj.bonus_maca, &heroj.kazna_maca_po_potezu, &heroj.bonus_stita);
+    fscanf(f, "%d\n", &heroj.broj_predmeta);
+
+    for (int i = 0; i < heroj.broj_predmeta; i++) {
+        fscanf(f, "%d %d %[^\n]\n", (int*)&heroj.inventar[i].tip, &heroj.inventar[i].bonus, heroj.inventar[i].naziv);
+    }
+
+    // Učitavanje pozicije igrača i trenutnog nivoa
+    fscanf(f, "%d %d %d\n", &px, &py, &trenutni_nivo);
+
+    fscanf(f, "%d\n", &rows);
+    for (int i = 0; i < rows; i++) {
+        fgets(map[i], MAX_COLS, f);
+        for (int j = 0; j < MAX_COLS; j++) {
+            if (map[i][j] == '\n' || map[i][j] == '\r') {
+                map[i][j] = '\0';
+            }
+        }
+    }
+
+    fscanf(f, "%d\n", &ukupno_ubijenih);
+
+    fclose(f);
+
+
+    // Uspešno učitana igra
+    return 1;
 }
 
 void meni() {
