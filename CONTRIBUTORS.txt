@@ -1,0 +1,45 @@
+CONTRIBUTORS
+
+
+25. maj 2026.
+Prvi dan sastali smo se i zajedno prošli kroz zadatak, kako bi shvatili naš zadatak i osmislili šta ćemo dodati kao bonus.
+
+Kreirali smo mape za 5 nivoa, postavili kordinatni sistem, dogovorili se oko simbola i opšte dinamike igre. 
+Napravili smo dogovor oko raspodele zadatka.
+
+
+27. maj 2026. - 29. maj 2026.
+Sastali smo se i shvatili da zbog nejednakog poznavanja programskog jezika C ne možemo da radimo odvojeno i doneli odluku da je timski rad najbolja opcija, gde svi članovi tima jednako učestvuju.
+Inicijalizovali smo protivnika i neprijatelja, ubacili potrebne promenljive i napravili dogovor kojim podacima trebamo da raspolažemo.
+Kompletan prikaz ekrana sa nivoom, HP barom, inventarom i mapom, napisali smo iscrtajHPBar() i prikaziKratakInventar()
+Kreirali smo uputstvo, meni, ubacili mape u folder projekta, omogućili otvaranje mapa, napravili da igrač može da se kreće.
+
+1. jun 2026. - 2. jun 2026.
+Definisali smo TipPredmeta enum sa svim tipovima, napisali napraviPredmet() koja puni naziv i bonus na osnovu tipa.
+Implementirali smo generisiNasumicanPredmet(), dodajPredmet(), prikaziInventar() sa opcijom odbacivanja predmeta.
+Napisali smo opremiMac() i opremiStit(), pitajZaOpremanje() koja se poziva odmah nakon pronalaska predmeta.
+
+3. jun 2026. 
+Implementirali smo generisiNeprijatelja() sa razlicitim tipovima neprijatelja po nivoima i nasumicnim statistikama.
+Napisali smo pokreniBorbu() - glavnu petlju borbe sa napadom, odbranom i bekstvom sa 50% šanse.
+Dodali smo misteriozniNapitak() - nasumicni buff ili debuff, sa otkrivanjem dejstva ako igrac odbije.
+
+4. jun 2026. - 5. jun 2026.
+Implementirali smo pomeriNeprijatelje() - nasumicno kretanje na nivoima 3 i vise nakon svakog poteza igraca.
+Dodali smo pamcenje HP-a neprijatelja kroz neprijatelj_tabela kako se stanje ne bi resetovalo pri ponovnom susretu.
+Napisali smo sacuvajIgru() i ucitajSacuvanuIgru() - cuvanje i ucitavanje celog stanja igre u save.dat.
+Dodali smo ispisiZavrsniEkran() sa statistikama partije i ukupno_ubijenih brojac koji se cuva u save.dat.
+
+
+6. jun 2026.
+Ceo dan pratili smo online tutorijale kako bi shvatili kako funkcioniše git.
+Savet starijih kolega bio je da koristimo VSCode za dodavanje koda. 
+Preko command prompta povezali smo vs code, napravili smo repozitorijum i ubacili mape.
+Sve smo ubacivali kroz terminal, kako bi kasnije na gitu poslali pull request gde smo jedni drugima odobravali dodati deo koda.
+
+7. jun 2026. - 8. jun 2026. 
+Počeli smo ubacivanje koda na git, ceo postupak može se ispratiti na gitu.
+
+9. juna 2026. 
+Napravili smo finalne izmene kako bi korisniku bila interesantnija igrica.
+
