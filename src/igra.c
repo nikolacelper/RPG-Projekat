@@ -640,33 +640,33 @@ Neprijatelj generisiNeprijatelja() {
     int r = rand() % 3;
 
     if (trenutni_nivo == 1) {
-        if (r == 0)      strcpy(n.naziv, "Goblin");
-        else if (r == 1) strcpy(n.naziv, "Vuk");
-        else             strcpy(n.naziv, "Lopov");
+        if (r == 0)      strcpy(n.naziv, "Stuart");
+        else if (r == 1) strcpy(n.naziv, "Amy Farrah Fowler");
+        else             strcpy(n.naziv, "Penny");
     }
     else if (trenutni_nivo == 2) {
-        if (r == 0)      strcpy(n.naziv, "Ork");
-        else if (r == 1) strcpy(n.naziv, "Pecinski pauk");
-        else             strcpy(n.naziv, "Mracni strazar");
+        if (r == 0)      strcpy(n.naziv, "Bernadette");
+        else if (r == 1) strcpy(n.naziv, "Rajesh Koothrappali");
+        else             strcpy(n.naziv, "Missy Cooper");
     }
     else if (trenutni_nivo == 3) {
-        if (r == 0)      strcpy(n.naziv, "Trol");
-        else if (r == 1) strcpy(n.naziv, "Crni vitez");
-        else             strcpy(n.naziv, "Otrovan duh");
+        if (r == 0)      strcpy(n.naziv, "George Cooper");
+        else if (r == 1) strcpy(n.naziv, "Marry Cooper");
+        else             strcpy(n.naziv, "Debbie Wolowitz");
     }
     else if (trenutni_nivo == 4) {
-        if (r == 0)      strcpy(n.naziv, "Vatreni demon");
-        else if (r == 1) strcpy(n.naziv, "Kameni cuvar");
-        else             strcpy(n.naziv, "Sjena");
+        if (r == 0)      strcpy(n.naziv, "Arthur Jeffries");
+        else if (r == 1) strcpy(n.naziv, "Bert Kibbler");
+        else             strcpy(n.naziv, "Barry Kripke");
     }
     else {
-        if (r == 0)      strcpy(n.naziv, "Zmajev sluga");
-        else if (r == 1) strcpy(n.naziv, "Gospodar lavirinta");
-        else             strcpy(n.naziv, "Drevni demon");
+        if (r == 0)      strcpy(n.naziv, "Sheldon Cooper");
+        else if (r == 1) strcpy(n.naziv, "Leonard Hofstadter");
+        else             strcpy(n.naziv, "Howard Wolowitz");
     }
 
-    n.hp      = (rand() % 50) + 1;
-    n.napad   = (rand() % 12) + 1;
+    n.hp      = (rand() % 31) + 30;
+    n.napad   = (rand() % 16) + 1;
     n.odbrana = (rand() % 8);
 
     return n;
@@ -1074,10 +1074,18 @@ void provjeriKaznuMaca() {
 
 /* Prelazak na sledeci nivo ili zavrsetak igre ako je zadnji nivo */
 void predjiNaSljedeciNivo() {
-    if (trenutni_nivo < UKUPNO_NIVOA) {
+    if (trenutni_nivo < UKUPNO_NIVOA){
         int sljedeci_nivo = trenutni_nivo + 1;
 
         system("cls");
+
+if(trenutni_nivo==1)
+    {  printf("ZAVRSIO SI IGRICU \n");
+       pauza();
+       system("cls");
+       printf("BAZINGA! ostalo ti je jos 4 nivoa\n");
+       pauza();
+       system("cls");}
 
         printf("Pronasao si izlaz!");
         printf("\nPrelazak na nivo %d.", sljedeci_nivo);
@@ -1088,8 +1096,8 @@ void predjiNaSljedeciNivo() {
             printf("\nNe mogu da ucitam nivo %d.", sljedeci_nivo);
             pauza();
             exit(1);
-        }
-    }
+        }}
+
     else {
         /* ispisi zavrsni ekran pri pobjedi */
         ispisiZavrsniEkran(1);
