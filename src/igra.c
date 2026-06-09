@@ -81,7 +81,7 @@ int px = 0;
 int py = 0;
 int trenutni_nivo = 1;
 
-/* NOVO - linija 70: brojac ubijenih neprijatelja tokom cijele partije */
+/* brojac ubijenih neprijatelja tokom cijele partije */
 int ukupno_ubijenih = 0;
 
 /* Tabela koja pamti cijelog neprijatelja na mapi po poziciji [y][x].
@@ -689,7 +689,7 @@ void ispisiStanjeBorbe(Neprijatelj n) {
     printf("----------------------------------\n");
 }
 
-/* NOVO - linija 546: pomocna funkcija za ispis zavrsnog ekrana */
+/*  pomocna funkcija za ispis zavrsnog ekrana */
 void ispisiZavrsniEkran(int pobjeda) {
     system("cls");
 
@@ -708,7 +708,7 @@ void ispisiZavrsniEkran(int pobjeda) {
 
     printf("--- STATISTIKE PARTIJE ---\n\n");
     printf("Dostignut nivo      : %d / %d\n", trenutni_nivo, UKUPNO_NIVOA);
-    printf("Ubijenih neprijatelja: %d\n", ukupno_ubijenih);   /* NOVO - linija 569 */
+    printf("Ubijenih neprijatelja: %d\n", ukupno_ubijenih);  
     printf("\n--- STANJE IGRACA ---\n\n");
     printf("HP                  : %d / %d\n", heroj.hp, heroj.max_hp);
     printf("Napad               : %d\n", heroj.napad);
@@ -867,7 +867,7 @@ int pokreniBorbu(Neprijatelj *vanjski) {
         }
 
         if (vanjski->hp <= 0) {
-            /* NOVO - linija 701: povecaj brojac kada neprijatelj pogine */
+            /* povecaj brojac kada neprijatelj pogine */
             ukupno_ubijenih++;
             printf("\n\nPobijedio si neprijatelja!");
             pauza();
@@ -879,7 +879,7 @@ int pokreniBorbu(Neprijatelj *vanjski) {
                 continue;
             }
 
-            /* NOVO - linija 711: ispisi zavrsni ekran pri porazu */
+            /* ispisi zavrsni ekran pri porazu */
             ispisiZavrsniEkran(0);
             exit(0);
         }
@@ -1066,7 +1066,6 @@ void provjeriKaznuMaca() {
                 return;
             }
 
-            /* NOVO - linija 878: ispisi zavrsni ekran pri smrti od maca */
             ispisiZavrsniEkran(0);
             exit(0);
         }
@@ -1092,7 +1091,7 @@ void predjiNaSljedeciNivo() {
         }
     }
     else {
-        /* NOVO - linija 898: ispisi zavrsni ekran pri pobjedi */
+        /* ispisi zavrsni ekran pri pobjedi */
         ispisiZavrsniEkran(1);
         exit(0);
     }
@@ -1189,127 +1188,156 @@ void pomjeriNeprijatelje() {
 
 /* Pokrece novu igru ili nastavlja sacuvanu, zatim ulazi u glavnu petlju */
 void novaIgra(int ucitaj_save) {
+    /* Ako je ucitaj_save == 1, igrac zeli nastaviti sacuvanu igru */
     if (ucitaj_save) {
+
+        /* Pokusava se ucitati save.dat */
         if (!ucitajSacuvanuIgru()) {
             printf("\nNije moguce ucitati sacuvanu igru.");
             pauza();
-            return;
+            return;   /* Ako save ne moze da se ucita, izlazi se iz funkcije */
         }
     }
     else {
-        heroj.hp = 100;
-        heroj.max_hp = 100;
+        /* Ako nije save, pocinje nova igra i resetuju se osnovne vrijednosti */
 
-        heroj.osnovni_napad = 10;
-        heroj.osnovna_odbrana = 10;
+        heroj.hp = 100;          /* Trenutni HP igraca */
+        heroj.max_hp = 100;      /* Maksimalni HP igraca */
 
-        heroj.napad = 10;
-        heroj.odbrana = 10;
+        heroj.osnovni_napad = 10;    /* Napad bez maca */
+        heroj.osnovna_odbrana = 10;  /* Odbrana bez stita */
 
-        heroj.bonus_maca = 0;
-        heroj.kazna_maca_po_potezu = 0;
-        heroj.bonus_stita = 0;
+        heroj.napad = 10;       /* Ukupan napad koji se koristi u borbi */
+        heroj.odbrana = 10;     /* Ukupna odbrana koja se koristi u borbi */
 
-        heroj.broj_predmeta = 0;
+        heroj.bonus_maca = 0;              /* Na pocetku nema bonus od maca */
+        heroj.kazna_maca_po_potezu = 0;    /* Na pocetku mac ne skida HP */
+        heroj.bonus_stita = 0;             /* Na pocetku nema bonus od stita */
 
+        heroj.broj_predmeta = 0;           /* Inventar je prazan */
 
-        ukupno_ubijenih = 0;
+        ukupno_ubijenih = 0;               /* Reset broja ubijenih neprijatelja */
 
-        izracunajStatistiku();
+        izracunajStatistiku();             /* Racuna napad i odbranu nakon reseta */
 
+        /* Ucitava prvi nivo iz fajla nivo1.txt */
         if (!ucitajNivo(1)) {
             pauza();
             return;
         }
     }
 
+    /* Glavna petlja igre - vrti se dok igrac ne izadje ili ne zavrsi igru */
     while (1) {
-        crtaj();
+        crtaj();               /* Iscrtava mapu, HP, inventar i podatke */
 
-        char c = _getch();
+        char c = _getch();     /* Cita pritisnut taster bez Enter-a */
 
+        /* Ako igrac pritisne Q, pita ga da li stvarno zeli izaci */
         if (c == 'q' || c == 'Q') {
             printf("\nStvarno zelis da izadjes iz igre? (d/n): ");
 
             char provera = _getch();
 
+            /* Ako potvrdi izlaz, igra se sacuva */
             if (provera == 'd' || provera == 'D') {
                 sacuvajIgru();
                 pauza();
-                break;
+                break;         /* Izlazi iz while petlje */
             }
             else {
-                continue;
+                continue;      /* Ako ne potvrdi, nastavlja igru */
             }
         }
 
+        /* Ako igrac pritisne I, otvara se inventar */
         if (c == 'i' || c == 'I') {
             prikaziInventar();
-            continue;
+            continue;          /* Nakon inventara vraca se na pocetak petlje */
         }
 
+        /* nx i ny su nova pozicija na koju igrac pokusava da se pomjeri */
         int nx = px;
         int ny = py;
 
+        /* Obrada kretanja */
         if (c == 'w' || c == 'W') {
-            ny--;
+            ny--;              /* Gore: y se smanjuje */
         }
         else if (c == 's' || c == 'S') {
-            ny++;
+            ny++;              /* Dole: y se povecava */
         }
         else if (c == 'a' || c == 'A') {
-            nx--;
+            nx--;              /* Lijevo: x se smanjuje */
         }
         else if (c == 'd' || c == 'D') {
-            nx++;
+            nx++;              /* Desno: x se povecava */
         }
         else {
-            continue;
+            continue;          /* Ako nije WASD/I/Q, ignorise se */
         }
 
+        /* Provjera da igrac ne izadje van granica mape */
         if (ny < 0 || ny >= rows || nx < 0 || nx >= strlen(map[ny])) {
             continue;
         }
 
+        /* Uzimamo znak sa polja na koje igrac pokusava da stane */
         char polje = map[ny][nx];
 
-        /* Na osnovu znaka polja odlucuje se sta se desava */
+        /* Zid - igrac ne moze proci */
         if (polje == '#') {
             continue;
         }
 
+        /* E znaci neprijatelj */
         if (polje == 'E') {
+
+            /* Ako neprijatelj na toj poziciji jos nije napravljen, napravi ga */
             if (!neprijatelj_aktivan[ny][nx]) {
                 neprijatelj_tabela[ny][nx] = generisiNeprijatelja();
                 neprijatelj_aktivan[ny][nx] = 1;
             }
 
+            /* Pokrece borbu sa neprijateljem sa te pozicije */
             int rezultat = pokreniBorbu(&neprijatelj_tabela[ny][nx]);
 
+            /* Ako je igrac pobijedio */
             if (rezultat == BORBA_POBJEDA) {
-                neprijatelj_aktivan[ny][nx] = 0;
-                map[ny][nx] = '.';
+                neprijatelj_aktivan[ny][nx] = 0;  /* Neprijatelj vise nije aktivan */
+                map[ny][nx] = '.';                /* Brise se sa mape */
 
-                map[py][px] = '.';
-                px = nx;
-                py = ny;
-                map[py][px] = '@';
+                map[py][px] = '.';                /* Stara pozicija igraca postaje prazna */
+                px = nx;                          /* Azurira se x pozicija igraca */
+                py = ny;                          /* Azurira se y pozicija igraca */
+                map[py][px] = '@';                /* Nova pozicija dobija znak igraca */
 
-                provjeriKaznuMaca();
-                pomjeriNeprijatelje();
+                provjeriKaznuMaca();              /* Ako ima tezak mac, skida HP */
+                pomjeriNeprijatelje();            /* Na nivoima 3+ pomjera neprijatelje */
             }
-            else if (rezultat == BORBA_BEKSTVO_NEPRIJATELJA) {
-                int dx[] = {0, 0, 1, -1};
-                int dy[] = {-1, 1, 0, 0};
 
+            /* Ako je neprijatelj pobjegao */
+            else if (rezultat == BORBA_BEKSTVO_NEPRIJATELJA) {
+                int dx[] = {0, 0, 1, -1};          /* Pomjeranje po x osi */
+                int dy[] = {-1, 1, 0, 0};          /* Pomjeranje po y osi */
+
+                /* Mijesa smjerove da bjekstvo bude nasumicno */
                 for (int k = 3; k > 0; k--) {
                     int j = rand() % (k + 1);
                     int tmp;
-                    tmp = dx[k]; dx[k] = dx[j]; dx[j] = tmp;
-                    tmp = dy[k]; dy[k] = dy[j]; dy[j] = tmp;
+
+                    tmp = dx[k]; 
+                    dx[k] = dx[j]; 
+                    dx[j] = tmp;
+
+                    tmp = dy[k]; 
+                    dy[k] = dy[j]; 
+                    dy[j] = tmp;
                 }
 
-                int premjesten = 0;
+                int premjesten = 0;                /* Da znamo da li je neprijatelj uspio pobjeci */
+
+                /* Pokusava naci prazno susjedno polje za neprijatelja */
                 for (int k = 0; k < 4; k++) {
                     int enx = nx + dx[k];
                     int eny = ny + dy[k];
@@ -1318,17 +1346,22 @@ void novaIgra(int ucitaj_save) {
                     if (enx < 0 || enx >= (int)strlen(map[eny])) continue;
                     if (map[eny][enx] != '.') continue;
 
+                    /* Prenosimo neprijatelja na novu poziciju */
                     neprijatelj_tabela[eny][enx] = neprijatelj_tabela[ny][nx];
                     neprijatelj_aktivan[eny][enx] = 1;
                     neprijatelj_aktivan[ny][nx] = 0;
-                    map[ny][nx] = '.';
-                    map[eny][enx] = 'E';
+
+                    map[ny][nx] = '.';             /* Staro polje neprijatelja se prazni */
+                    map[eny][enx] = 'E';           /* Novo polje dobija neprijatelja */
+
                     premjesten = 1;
                     break;
                 }
 
+                /* Ako nije premjesten, ostaje gdje jeste */
                 if (!premjesten) { }
 
+                /* Igrac ulazi na polje gdje je neprijatelj bio */
                 map[py][px] = '.';
                 px = nx;
                 py = ny;
@@ -1337,38 +1370,46 @@ void novaIgra(int ucitaj_save) {
                 provjeriKaznuMaca();
                 pomjeriNeprijatelje();
             }
+
+            /* Ako je igrac pobjegao, ostaje na staroj poziciji */
             else if (rezultat == BORBA_BEKSTVO_IGRACA) {
                 continue;
             }
         }
+
+        /* $ znaci kutija/predmet */
         else if (polje == '$') {
             Predmet novi_predmet;
 
+            /* Ako je ova kutija garantovani kljuc, pravi se kljuc */
             if (ny == garantovani_kljuc_y && nx == garantovani_kljuc_x) {
                 napraviPredmet(&novi_predmet, KLJUC);
                 garantovani_kljuc_y = -1;
                 garantovani_kljuc_x = -1;
             }
             else {
+                /* Ako nije garantovani kljuc, pravi se nasumican predmet */
                 novi_predmet = generisiNasumicanPredmet();
             }
 
-            dodajPredmet(novi_predmet);
+            dodajPredmet(novi_predmet);            /* Dodaje predmet u inventar */
 
-            map[ny][nx] = '.';
+            map[ny][nx] = '.';                     /* Kutija nestaje */
 
-            map[py][px] = '.';
+            map[py][px] = '.';                     /* Stara pozicija igraca */
             px = nx;
             py = ny;
-            map[py][px] = '@';
+            map[py][px] = '@';                     /* Nova pozicija igraca */
 
             provjeriKaznuMaca();
             pomjeriNeprijatelje();
         }
+
+        /* ? znaci misteriozni napitak */
         else if (polje == '?') {
-            misteriozniNapitak();
+            misteriozniNapitak();                  /* Aktivira logiku napitka */
 
-            map[ny][nx] = '.';
+            map[ny][nx] = '.';                     /* Napitak nestaje sa mape */
 
             map[py][px] = '.';
             px = nx;
@@ -1378,8 +1419,10 @@ void novaIgra(int ucitaj_save) {
             provjeriKaznuMaca();
             pomjeriNeprijatelje();
         }
+
+        /* L znaci zakljucan izlaz */
         else if (polje == 'L') {
-            int indeks_kljuca = imaKljuc();
+            int indeks_kljuca = imaKljuc();         /* Trazimo kljuc u inventaru */
 
             if (indeks_kljuca == -1) {
                 printf("\nOvaj izlaz je zakljucan. Potreban ti je kljuc.");
@@ -1387,6 +1430,7 @@ void novaIgra(int ucitaj_save) {
                 continue;
             }
 
+            /* Ako ima kljuc, trosi se i prelazi se nivo */
             printf("\nOtkljucao si izlaz pomocu kljuca!");
             ukloniPredmet(indeks_kljuca);
             pauza();
@@ -1394,18 +1438,27 @@ void novaIgra(int ucitaj_save) {
             predjiNaSljedeciNivo();
             continue;
         }
+
+        /* > znaci obican izlaz */
         else if (polje == '>') {
+
+            /* Na zadnjem nivou i obican izlaz trazi kljuc */
             if (trenutni_nivo == UKUPNO_NIVOA && imaKljuc() == -1) {
                 printf("\nOva vrata su zakljucana. Potreban ti je kljuc da izadjes!");
                 pauza();
                 continue;
             }
+
+            /* Ako je zadnji nivo i ima kljuc, kljuc se uklanja */
             if (trenutni_nivo == UKUPNO_NIVOA) {
                 ukloniPredmet(imaKljuc());
             }
+
             predjiNaSljedeciNivo();
             continue;
         }
+
+        /* Ako je obicno prazno polje, igrac se samo pomjera */
         else {
             map[py][px] = '.';
             px = nx;
@@ -1478,7 +1531,7 @@ void sacuvajIgru() {
         fprintf(f, "%s\n", map[i]);
     }
 
-    /* NOVO - linija 1228: sacuvaj i broj ubijenih da se ne izgubi pri nastavku */
+    /* sacuvaj i broj ubijenih da se ne izgubi pri nastavku */
     fprintf(f, "%d\n", ukupno_ubijenih);
 
     fclose(f);
@@ -1516,7 +1569,7 @@ int ucitajSacuvanuIgru() {
         }
     }
 
-    /* NOVO - linija 1260: ucitaj broj ubijenih iz save fajla */
+    /* ucitaj broj ubijenih iz save fajla */
     fscanf(f, "%d\n", &ukupno_ubijenih);
 
     fclose(f);
